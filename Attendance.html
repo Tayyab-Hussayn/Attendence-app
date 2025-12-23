@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- iOS Support -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Attendance">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <title>Tracking Repository</title>
+    <link rel="manifest" href="manifest.json">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 20px;
+        }
+
+        .name-section {
+            background: #f0fdf4;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #10b981;
+        }
+
+        .name-section label {
+            display: block;
+            font-weight: bold;
+            color: #059669;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .name-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #10b981;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .name-section input:disabled {
+            background: #e5e7eb;
+            cursor: not-allowed;
+        }
+
+        .date-display {
+            background: #ede9fe;
+            padding: 12px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-left: 4px solid #8b5cf6;
+            font-weight: bold;
+            color: #6d28d9;
+            font-size: 15px;
+        }
+
+        .section {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 15px;
+        }
+
+        .prayer-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .prayer-box {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .prayer-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .prayer-box.prayed {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .prayer-box.missed {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .prayer-name {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .prayer-status {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .checkbox-box {
+            flex: 1;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e5e7eb;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .checkbox-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkbox-box.active {
+            background: #10b981;
+            color: white;
+            border-color: #10b981;
+        }
+
+        .save-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 5px;
+        }
+
+        .save-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .history-section {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #f59e0b;
+        }
+
+        .history-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #92400e;
+            margin-bottom: 15px;
+        }
+
+        #historyList {
+            margin-bottom: 15px;
+        }
+
+        .history-item {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-date {
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .history-score {
+            font-size: 14px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .score-high {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .score-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .score-low {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #9ca3af;
+            font-style: italic;
+            padding: 15px;
+        }
+
+        .send-report-btn {
+            width: 100%;
+            padding: 16px;
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .send-report-btn:hover {
+            background: #1fa855;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
+        }
+
+        .send-report-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .prayer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="parent-container">
+        <div class="header">
+            <h1>→ Today’s Islamic Activities</h1>
+            <p>Track daily worship and build good habits</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <div class="name-section">
+                <label> Child's Name:</label>
+                <input type="text" placeholder="Enter your name">
+            </div>
+
+            <!-- Today's Date -->
+            <div class="date-display" id="dateDisplay">
+                Loading date...
+            </div>
+
+            <!-- 5 Daily Prayers Section -->
+            <div class="section">
+                <div class="section-title">5 Daily Prayers</div>
+                <!-- Prayers grid -->
+                <div class="prayer-grid">
+                    <div class="prayer-box" id="fajr">
+                        <div class="prayer-name">Fajr</div>
+                        <div class="prayer-status">Pending</div>
+                    </div>
+
+                    <div class="prayer-box" id="dhuhr">
+                        <div class="prayer-name">Dhuhr</div>
+                        <div class="prayer-status">Pending</div>
+                    </div>
+
+                    <div class="prayer-box" id="asr">
+                        <div class="prayer-name">Asr</div>
+                        <div class="prayer-status">Pending</div>
+                    </div>
+
+                    <div class="prayer-box" id="maghrib">
+                        <div class="prayer-name">Maghrib</div>
+                        <div class="prayer-status">Pending</div>
+                    </div>
+
+                    <div class="prayer-box" id="isha">
+                        <div class="prayer-name">Isha</div>
+                        <div class="prayer-status">Pending</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quran Tilawat Section -->
+            <div class="section">
+                <div class="section-title"> Quran Tilawat</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-box" id="quran-yes">
+                        ✔ Completed today
+                    </div>
+                    <div class="checkbox-box" id="quran-no">
+                        ❌ Not completed
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dua Revision Section -->
+            <div class="section">
+                <div class="section-title">🤲 Dua Revision (50 times each)</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-box" id="dua-yes">
+                        ✔ Yes, I completed today
+                    </div>
+                    <div class="checkbox-box" id="dua-no">
+                        ❌ No, I didn't completed today
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parent Khidmaat -->
+            <div class="section">
+                <div class="section-title">👨‍👩‍👦 Served Parents</div>
+                <div class="checkbox-group">
+                    <div class="checkbox-box" id="parent-yes">
+                        ✔ Yes, I helped today
+                    </div>
+                    <div class="checkbox-box" id="parent-no">
+                        ❌ No, I didn't help today
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save Button -->
+            <button class="save-btn" id="saveBtn">Save Today's Record</button>
+            <!-- History Section -->
+            <div class="history-section">
+                <div class="history-title">Saved Records</div>
+                <div id="historyList">
+                    <p class="empty-message">No records yet. Start tracking today!</p>
+                </div>
+                <button class="send-report-btn" id="sendReportBtn">
+                    Send Report
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const MESSAGES = {
+            saved: "Progress saved successfully!",
+            incomplete: "Please fill in all details before saving.",
+            nameRequired: "Please enter the child's name."
+        };
+
+        const STORAGE_KEY = 'islamic_tracker_history';
+        const SETTINGS_KEY = 'islamic_tracker_settings';
+
+        let todayData = {
+            date: new Date().toLocaleDateString(),
+            timestamp: Date.now(),
+            name: '',
+            prayers: {
+                fajr: null, // null = pending, true = prayed, false = missed
+                dhuhr: null,
+                asr: null,
+                maghrib: null,
+                isha: null
+            },
+            quran: null, // true/false
+            duas: null,
+            parents: null
+        };
+
+        // --- DOM Elements ---
+        const els = {
+            dateDisplay: document.getElementById('dateDisplay'),
+            nameInput: document.querySelector('.name-section input'),
+            saveBtn: document.getElementById('saveBtn'),
+            reportBtn: document.getElementById('sendReportBtn'),
+            historyList: document.getElementById('historyList'),
+            prayers: {
+                fajr: document.getElementById('fajr'),
+                dhuhr: document.getElementById('dhuhr'),
+                asr: document.getElementById('asr'),
+                maghrib: document.getElementById('maghrib'),
+                isha: document.getElementById('isha')
+            },
+            checkboxes: {
+                quran: { yes: document.getElementById('quran-yes'), no: document.getElementById('quran-no') },
+                duas: { yes: document.getElementById('dua-yes'), no: document.getElementById('dua-no') },
+                parents: { yes: document.getElementById('parent-yes'), no: document.getElementById('parent-no') }
+            }
+        };
+
+        // --- Initialization ---
+        function init() {
+            displayDate();
+            loadSettings();
+            loadTodayProgress();
+            renderHistory();
+            attachEventListeners();
+        }
+
+        // --- Core Functions ---
+
+        function displayDate() {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            els.dateDisplay.textContent = '📅 ' + new Date().toLocaleDateString('en-US', options);
+        }
+
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem(SETTINGS_KEY) || '{}');
+            if (settings.name) {
+                els.nameInput.value = settings.name;
+                todayData.name = settings.name;
+            }
+        }
+
+        function loadTodayProgress() {
+            // Check if we already saved something for today
+            const history = getHistory();
+            const todayStr = new Date().toLocaleDateString();
+            const todayRecord = history.find(r => r.date === todayStr);
+
+            if (todayRecord) {
+                todayData = { ...todayRecord }; // Restore state
+                restoreUI();
+            }
+        }
+
+        function restoreUI() {
+            // Restore Prayers
+            Object.keys(todayData.prayers).forEach(pKey => {
+                const status = todayData.prayers[pKey];
+                const box = els.prayers[pKey];
+                updatePrayerUI(pKey, box, status);
+            });
+
+            // Restore Checkboxes
+            restoreCheckboxGroup('quran', els.checkboxes.quran);
+            restoreCheckboxGroup('duas', els.checkboxes.duas);
+            restoreCheckboxGroup('parents', els.checkboxes.parents);
+        }
+
+        function restoreCheckboxGroup(dataKey, domGroup) {
+            const val = todayData[dataKey];
+            if (val === true) {
+                domGroup.yes.classList.add('active');
+                domGroup.no.classList.remove('active');
+            } else if (val === false) {
+                domGroup.no.classList.add('active');
+                domGroup.yes.classList.remove('active');
+            }
+        }
+
+        function getHistory() {
+            return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+        }
+
+        function saveRecord() {
+            todayData.name = els.nameInput.value.trim();
+
+            if (!todayData.name) {
+                alert(MESSAGES.nameRequired);
+                return;
+            }
+
+            // Save Name Preference
+            localStorage.setItem(SETTINGS_KEY, JSON.stringify({ name: todayData.name }));
+
+            // Update History
+            let history = getHistory();
+            const todayStr = new Date().toLocaleDateString();
+
+            // Remove existing entry for today if any (to overwrite)
+            history = history.filter(r => r.date !== todayStr);
+
+            // Add current data
+            todayData.date = todayStr;
+            todayData.timestamp = Date.now();
+            history.unshift(todayData); // Add to top
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+
+            alert(MESSAGES.saved);
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const history = getHistory();
+            els.historyList.innerHTML = '';
+
+            if (history.length === 0) {
+                els.historyList.innerHTML = '<p class="empty-message">No records yet. Start tracking today!</p>';
+                return;
+            }
+
+            history.forEach(record => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+
+                // Calculate Score
+                let score = 0;
+                Object.values(record.prayers).forEach(p => { if (p === true) score++; });
+                if (record.quran) score++;
+                if (record.duas) score++;
+                if (record.parents) score++;
+
+                const total = 8; // 5 prayers + 3 extras
+                let scoreClass = 'score-low';
+                if (score >= 7) scoreClass = 'score-high';
+                else if (score >= 4) scoreClass = 'score-medium';
+
+                item.innerHTML = `
+                    <span class="history-date">${record.date}</span>
+                    <span class="history-score ${scoreClass}">${score}/${total} Done</span>
+                `;
+                els.historyList.appendChild(item);
+            });
+        }
+
+        // --- Interaction Handlers ---
+
+        function handlePrayerClick(prayerName, box) {
+            // null -> true (prayed) -> false (missed) -> null
+            let current = todayData.prayers[prayerName];
+            let nextState = null;
+
+            // Cycle logic
+            if (current === null) nextState = true;
+            else if (current === true) nextState = false;
+            else nextState = null;
+
+            todayData.prayers[prayerName] = nextState;
+            updatePrayerUI(prayerName, box, nextState);
+        }
+
+        function updatePrayerUI(name, box, state) {
+            const statusText = box.querySelector('.prayer-status');
+
+            // Reset classes
+            box.classList.remove('prayed', 'missed');
+
+            if (state === true) {
+                box.classList.add('prayed');
+                statusText.textContent = 'Completed';
+            } else if (state === false) {
+                box.classList.add('missed');
+                statusText.textContent = 'Missed';
+            } else {
+                statusText.textContent = 'Pending';
+            }
+        }
+
+        function handleBinaryClick(category, isYes) {
+            todayData[category] = isYes;
+
+            const group = els.checkboxes[category];
+
+            if (isYes) {
+                group.yes.classList.add('active');
+                group.no.classList.remove('active');
+            } else {
+                group.no.classList.add('active');
+                group.yes.classList.remove('active');
+            }
+        }
+
+        function sendReport() {
+            const history = getHistory();
+
+            // Check if we have any data to report (either history or current unsaved)
+            if (history.length === 0 && !todayData.name) {
+                alert("⚠️ No records found to report. Please save today's record first.");
+                return;
+            }
+
+            // If user hasn't saved today yet, warn them or just use history?
+            // "after 3 days he will have to send report" -> implies sending Saved History.
+
+            // Get last 3 records
+            const reportData = history.slice(0, 3);
+
+            if (reportData.length === 0) {
+                alert("⚠️ No saved history found. Please save your daily records first.");
+                return;
+            }
+
+            // Use name from the most recent record
+            const childName = reportData[0].name || "Child";
+
+            let messageChunks = [];
+
+            // Header
+            messageChunks.push(`🕌 *3-Day Attendance Report*\n👤 Name: ${childName}\n`);
+
+            // Loop through each day
+            reportData.forEach((dayRecord) => {
+                const p = dayRecord.prayers;
+                const completed = [];
+                const missed = [];
+
+                // Helper
+                const addItem = (label, status, isBinary = false) => {
+                    if (status === true) {
+                        completed.push(`✔ ${label}`);
+                    } else {
+                        const icon = (status === false) ? '❌' : (isBinary ? '❓' : '⏳');
+                        missed.push(`${icon} ${label}`);
+                    }
+                };
+
+                // Sort items for this day
+                addItem('Fajr', p.fajr);
+                addItem('Dhuhr', p.dhuhr);
+                addItem('Asr', p.asr);
+                addItem('Maghrib', p.maghrib);
+                addItem('Isha', p.isha);
+                addItem('Quran Tilawat', dayRecord.quran, true);
+                addItem('Dua Revision', dayRecord.duas, true);
+                addItem('Served Parents', dayRecord.parents, true);
+
+                // Build Day Block
+                let dayBlock = `� *Date: ${dayRecord.date}*\n`;
+
+                if (completed.length > 0) {
+                    dayBlock += `✅ *COMPLETED*\n${completed.join('\n')}\n`;
+                } else {
+                    dayBlock += `✅ *COMPLETED*\n_None_\n`;
+                }
+
+                if (missed.length > 0) {
+                    dayBlock += `\n⚠️ *MISSED / PENDING*\n${missed.join('\n')}`;
+                } else {
+                    dayBlock += `\n⚠️ *MISSED / PENDING*\n_None_`;
+                }
+
+                messageChunks.push(dayBlock);
+                messageChunks.push('-------------------');
+            });
+
+            // Remove last separator and add footer
+            messageChunks.pop();
+            messageChunks.push(`\n_Sent via Islamic Tracker App_`);
+
+            const text = messageChunks.join('\n');
+            const encoded = encodeURIComponent(text);
+            window.open(`https://wa.me/923213875210?text=${encoded}`, '_blank');
+
+            // Auto-Clear Data after sending
+            clearData();
+        }
+
+        function clearData() {
+            // 1. Clear History from Storage
+            localStorage.removeItem(STORAGE_KEY);
+
+            // 2. Reset InMemory State (Preserve Name & Date)
+            todayData.prayers = { fajr: null, dhuhr: null, asr: null, maghrib: null, isha: null };
+            todayData.quran = null;
+            todayData.duas = null;
+            todayData.parents = null;
+            // Name stays: todayData.name
+
+            // 3. Clear UI
+            // Reset Prayers
+            Object.values(els.prayers).forEach(box => {
+                box.classList.remove('prayed', 'missed');
+                box.querySelector('.prayer-status').textContent = 'Pending';
+            });
+
+            // Reset Checkboxes
+            Object.values(els.checkboxes).forEach(group => {
+                group.yes.classList.remove('active');
+                group.no.classList.remove('active');
+            });
+
+            // Re-render empty history
+            renderHistory();
+
+            // Notify User (Optional, or just silent)
+            alert("✅ Report sent! \n\nAll attendance history has been cleared for the new cycle.");
+        }
+
+        // --- Event Listeners ---
+        function attachEventListeners() {
+            // Prayers
+            Object.keys(els.prayers).forEach(key => {
+                els.prayers[key].addEventListener('click', () => handlePrayerClick(key, els.prayers[key]));
+            });
+
+            // Checkboxes
+            ['quran', 'duas', 'parents'].forEach(cat => {
+                els.checkboxes[cat].yes.addEventListener('click', () => handleBinaryClick(cat, true));
+                els.checkboxes[cat].no.addEventListener('click', () => handleBinaryClick(cat, false));
+            });
+
+            // Buttons
+            els.saveBtn.addEventListener('click', saveRecord);
+            els.reportBtn.addEventListener('click', sendReport);
+
+            // Name Input
+            els.nameInput.addEventListener('input', (e) => todayData.name = e.target.value);
+        }
+
+        // Start App
+        document.addEventListener('DOMContentLoaded', init);
+        
+// Register service worker
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+        .then(function(registration) {
+            console.log('Service Worker registered successfully');
+        })
+        .catch(function(error) {
+            console.log('Service Worker registration failed:', error);
+        });
+}
+    </script>
+
+</body>
+
+</html>git 
