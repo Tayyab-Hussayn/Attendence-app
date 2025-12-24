@@ -1,5 +1,5 @@
 // Service Worker - Makes app work offline
-const CACHE_NAME = 'ibadah-tracker-v1';
+const CACHE_NAME = 'ibadah-tracker-v2';
 const urlsToCache = [
     './',
     './Attendance.html',
